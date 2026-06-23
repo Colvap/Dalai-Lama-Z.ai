@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tenzin Gyatso · The 14th Dalai Lama — An Archive of Compassion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;800;900&display=swap">
+<style>
+  :root {
+    --void-black: #050508;
+    --void-dark:  #0A0A0F;
+    --neon-cyan:  #00D4FF;
+    --neon-blue:  #4D9FFF;
+    --neon-soft:  #9DC4FF;
+    --ink-soft:   rgba(255,255,255,0.7);
+    --ink-mute:   rgba(255,255,255,0.5);
+    --ink-faint:  rgba(255,255,255,0.3);
+    --ease-quiet:    cubic-bezier(.22, 1, .36, 1);
+    --ease-precise:  cubic-bezier(.4, 0, .2, 1);
+    --ease-emphasis: cubic-bezier(.16, 1, .3, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: var(--void-black);
+    color: #fff;
+    overflow-x: clip;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    line-height: 1.5;
+  }
+
+  ::selection { background: var(--neon-cyan); color: var(--void-black); }
+
+  a { color: inherit; }
+
+  /* === Matrix rain canvas === */
+  canvas.rain {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.55;
+  }
+
+  /* === Top navigation === */
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1.4rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    background: linear-gradient(to bottom, rgba(5,5,8,0.92), rgba(5,5,8,0.5) 70%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .nav__brand { color: var(--neon-cyan); font-weight: 700; }
+  .nav__links { display: flex; gap: 1.8rem; }
+  .nav__links a {
+    color: var(--ink-soft);
+    text-decoration: none;
+    transition: color 300ms var(--ease-quiet);
+  }
+  .nav__links a:hover { color: var(--neon-cyan); }
+
+  /* === Hero (sticky) === */
+  .hero {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 2rem;
+    overflow: hidden;
+  }
+
+  .hero__bg-portrait {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.16;
+    background-size: cover;
+    background-position: center 30%;
+    filter: grayscale(1) contrast(1.15) brightness(0.9);
+    will-change: transform, opacity;
+  }
+
+  .hero__label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.32em;
+    color: var(--neon-cyan);
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: hero-fade 800ms var(--ease-quiet) 300ms forwards;
+  }
+  .hero__label::before {
+    content: '';
+    display: inline-block;
+    width: 28px;
+    height: 1px;
+    background: var(--neon-cyan);
+    vertical-align: middle;
+    margin-right: 1rem;
+  }
+
+  .hero__title {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: clamp(2.4rem, 8.5vw, 8.5rem);
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    text-align: center;
+    color: #fff;
+    margin-bottom: 2rem;
+    text-shadow: 0 0 30px rgba(0, 212, 255, 0.15);
+    will-change: transform, opacity;
+  }
+
+  .hero__subtitle {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: clamp(0.95rem, 1.15vw, 1.05rem);
+    line-height: 1.6;
+    letter-spacing: 0.005em;
+    color: var(--ink-soft);
+    text-align: center;
+    max-width: 620px;
+    margin-bottom: 3.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: hero-fade 1000ms var(--ease-quiet) 1900ms forwards;
+    will-change: transform, opacity;
+  }
+
+  .hero__scroll {
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    opacity: 0;
+    animation: hero-fade 800ms var(--ease-quiet) 2500ms forwards;
+    will-change: transform, opacity;
+  }
+  .hero__scroll::after {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 30px;
+    background: var(--ink-faint);
+    margin: 0.8rem auto 0;
+    animation: scroll-line 2s var(--ease-quiet) infinite;
+  }
+
+  @keyframes hero-fade {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scroll-line {
+    0%   { transform: scaleY(0); transform-origin: top; }
+    50%  { transform: scaleY(1); transform-origin: top; }
+    51%  { transform: scaleY(1); transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+
+  /* === Below hero === */
+  .below {
+    position: relative;
+    z-index: 2;
+    background: var(--void-black);
+  }
+
+  section {
+    padding: 8rem 2rem;
+    position: relative;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; }
+  .container-narrow { max-width: 860px; margin: 0 auto; }
+  .container-wide { max-width: 1600px; margin: 0 auto; }
+
+  /* === Section label === */
+  .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.26em;
+    color: var(--neon-cyan);
+    text-transform: uppercase;
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .label::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--neon-cyan);
+  }
+
+  /* === Manifesto === */
+  #manifesto {
+    padding: 12rem 2rem 14rem;
+  }
+  .manifesto-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: clamp(1.4rem, 2.3vw, 2.05rem);
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .manifesto-text .word {
+    display: inline-block;
+    will-change: filter, opacity;
+  }
+  .manifesto-attribution {
+    margin-top: 3rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.74rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  /* === Biography === */
+  #biography {
+    padding: 8rem 2rem 14rem;
+  }
+  .section-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.3rem, 4.8vw, 4.4rem);
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: #fff;
+  }
+  .section-intro {
+    margin-top: 2rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    max-width: 600px;
+  }
+
+  .bio-list { display: flex; flex-direction: column; gap: 7rem; margin-top: 6rem; }
+
+  .bio-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  .bio-item:nth-child(even) .bio-item__media { order: 2; }
+  .bio-item:nth-child(even) .bio-item__content { order: 1; }
+
+  .bio-item__media {
+    aspect-ratio: 4/5;
+    overflow: hidden;
+    position: relative;
+    background: var(--void-dark);
+    will-change: clip-path;
+  }
+  .bio-item__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,212,255,0.05), transparent 60%);
+    pointer-events: none;
+  }
+  .bio-item__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.05) brightness(0.85);
+    will-change: transform;
+  }
+  .bio-item__year {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.22em;
+    color: var(--neon-cyan);
+    margin-bottom: 1.2rem;
+    text-transform: uppercase;
+  }
+  .bio-item__heading {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.5rem, 2.4vw, 2.15rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+    color: #fff;
+  }
+  .bio-item__body {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--ink-soft);
+  }
+  .bio-item__body p + p { margin-top: 1rem; }
+
+  /* === Three Pillars === */
+  #pillars {
+    padding: 8rem 2rem 14rem;
+    background: var(--void-dark);
+    position: relative;
+  }
+  #pillars::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(0,212,255,0.3), transparent);
+  }
+
+  .pillars-list {
+    display: flex;
+    flex-direction: column;
+    margin-top: 5rem;
+  }
+  .pillar {
+    display: grid;
+    grid-template-columns: 60px 1.3fr 2fr 160px;
+    gap: 2rem;
+    padding: 3.2rem 0 3.2rem 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    position: relative;
+    align-items: start;
+    transition: background 600ms var(--ease-quiet);
+  }
+  .pillar:last-child { border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .pillar::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2px;
+    height: 0;
+    background: var(--neon-cyan);
+    transition: height 600ms var(--ease-quiet);
+  }
+  .pillar:hover::before { height: 100%; }
+  .pillar:hover { background: rgba(0,212,255,0.025); }
+
+  .pillar__num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.15em;
+    transition: color 600ms var(--ease-quiet);
+    padding-top: 0.4rem;
+  }
+  .pillar:hover .pillar__num { color: var(--neon-cyan); }
+
+  .pillar__name {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.65rem;
+    letter-spacing: -0.015em;
+    color: #fff;
+    line-height: 1.1;
+    transition: color 600ms var(--ease-quiet);
+  }
+  .pillar:hover .pillar__name { color: var(--neon-cyan); }
+  .pillar__tibetan {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    color: var(--ink-faint);
+    margin-top: 0.7rem;
+    letter-spacing: 0.05em;
+    transition: color 600ms var(--ease-quiet);
+  }
+  .pillar:hover .pillar__tibetan { color: var(--ink-soft); }
+
+  .pillar__body {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.97rem;
+    line-height: 1.65;
+    color: var(--ink-mute);
+    transition: color 600ms var(--ease-quiet);
+    padding-top: 0.3rem;
+  }
+  .pillar:hover .pillar__body { color: var(--ink-soft); }
+
+  .pillar__year {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    text-align: right;
+    padding-top: 0.5rem;
+  }
+
+  /* === Lineage === */
+  #lineage { padding: 8rem 2rem 14rem; }
+
+  .lineage-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0 4rem;
+    margin-top: 5rem;
+  }
+  .lama {
+    padding: 1.8rem 0 1.8rem 1rem;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    display: grid;
+    grid-template-columns: 50px 1fr 140px;
+    gap: 1.5rem;
+    align-items: baseline;
+    position: relative;
+    transition: background 400ms var(--ease-quiet);
+  }
+  .lama::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2px;
+    height: 0;
+    background: var(--neon-cyan);
+    transition: height 500ms var(--ease-quiet);
+  }
+  .lama:hover::before { height: 100%; }
+  .lama:hover { background: rgba(0,212,255,0.02); }
+
+  .lama:last-child { border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .lama:nth-last-child(2):nth-child(odd) { border-bottom: 1px solid rgba(255,255,255,0.07); }
+
+  .lama__num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.15em;
+  }
+  .lama__name {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: -0.01em;
+    color: #fff;
+    transition: color 400ms var(--ease-quiet);
+  }
+  .lama:hover .lama__name { color: var(--neon-cyan); }
+  .lama__dates {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.74rem;
+    letter-spacing: 0.15em;
+    color: var(--ink-mute);
+    text-align: right;
+  }
+  .lama.current { background: rgba(0,212,255,0.05); }
+  .lama.current::before { height: 100%; }
+  .lama.current .lama__num,
+  .lama.current .lama__name { color: var(--neon-cyan); }
+  .lama.current .lama__dates { color: var(--neon-cyan); }
+
+  /* === Quotes === */
+  #quotes {
+    padding: 10rem 2rem 14rem;
+    background: var(--void-dark);
+    position: relative;
+  }
+  #quotes::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(0,212,255,0.3), transparent);
+  }
+
+  .quotes-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1.5rem;
+    margin-top: 5rem;
+  }
+  .quote {
+    padding: 3rem 2.5rem;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: var(--void-black);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 500ms var(--ease-quiet);
+  }
+  .quote:hover { border-color: rgba(0,212,255,0.3); }
+  .quote::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--neon-cyan);
+    transition: width 800ms var(--ease-quiet);
+  }
+  .quote:hover::before { width: 100%; }
+
+  .quote--lg { grid-column: span 7; }
+  .quote--md { grid-column: span 5; }
+  .quote--full { grid-column: span 12; }
+
+  .quote__text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    letter-spacing: -0.012em;
+    line-height: 1.3;
+    margin-bottom: 1.5rem;
+    color: #fff;
+  }
+  .quote--lg .quote__text { font-size: clamp(1.35rem, 2vw, 1.85rem); }
+  .quote--md .quote__text { font-size: clamp(1.1rem, 1.5vw, 1.3rem); }
+  .quote--full .quote__text {
+    font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    text-align: center;
+    padding: 0 1rem;
+  }
+  .quote__attr {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+  }
+
+  /* === Library === */
+  #library { padding: 8rem 2rem 14rem; }
+
+  .book-list { display: flex; flex-direction: column; margin-top: 5rem; }
+  .book {
+    display: grid;
+    grid-template-columns: 80px 1.4fr 2fr 120px;
+    gap: 2rem;
+    padding: 1.8rem 0 1.8rem 1rem;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    align-items: baseline;
+    position: relative;
+    transition: padding-left 500ms var(--ease-quiet), background 500ms var(--ease-quiet);
+  }
+  .book:last-child { border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .book::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2px;
+    height: 0;
+    background: var(--neon-cyan);
+    transition: height 600ms var(--ease-quiet);
+  }
+  .book:hover::before { height: 100%; }
+  .book:hover { padding-left: 1.5rem; background: rgba(0,212,255,0.02); }
+
+  .book__year {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--neon-cyan);
+    letter-spacing: 0.15em;
+  }
+  .book__title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #fff;
+    letter-spacing: -0.01em;
+    transition: color 400ms var(--ease-quiet);
+  }
+  .book:hover .book__title { color: var(--neon-cyan); }
+  .book__desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--ink-mute);
+  }
+  .book__lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    text-align: right;
+  }
+
+  /* === Honors === */
+  #honors {
+    padding: 8rem 2rem 14rem;
+    background: var(--void-dark);
+    position: relative;
+  }
+  #honors::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(0,212,255,0.3), transparent);
+  }
+  .honors-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0 4rem;
+    margin-top: 5rem;
+  }
+  .honor {
+    padding: 1.8rem 0;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 1.5rem;
+    align-items: baseline;
+    position: relative;
+    transition: background 400ms var(--ease-quiet);
+  }
+  .honor::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2px;
+    height: 0;
+    background: var(--neon-cyan);
+    transition: height 500ms var(--ease-quiet);
+  }
+  .honor:hover::before { height: 100%; }
+  .honor:hover { background: rgba(0,212,255,0.02); }
+  .honor__year {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--neon-cyan);
+    letter-spacing: 0.15em;
+  }
+  .honor__text {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.02rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .honor__text strong {
+    color: #fff;
+    font-weight: 700;
+  }
+
+  /* === Footer === */
+  footer {
+    padding: 6rem 2rem 3rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    background: var(--void-black);
+    position: relative;
+    z-index: 2;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 4rem;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .footer-mantra {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.05rem;
+    color: var(--neon-cyan);
+    letter-spacing: 0.08em;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+  }
+  .footer-translit {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    color: var(--ink-mute);
+    line-height: 1.7;
+    max-width: 380px;
+  }
+  .footer-col h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col li {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+  }
+  .footer-col a {
+    color: var(--ink-soft);
+    text-decoration: none;
+    transition: color 300ms var(--ease-quiet);
+  }
+  .footer-col a:hover { color: var(--neon-cyan); }
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* === Mobile === */
+  @media (max-width: 900px) {
+    .pillar { grid-template-columns: 40px 1fr; }
+    .pillar__body, .pillar__year { grid-column: span 2; }
+    .pillar__year { text-align: left; padding-top: 0; }
+    .lineage-grid, .honors-list { grid-template-columns: 1fr; gap: 0; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    .nav { padding: 1rem 1.2rem; }
+    .nav__links { display: none; }
+    section { padding: 5rem 1.5rem; }
+    #manifesto { padding: 8rem 1.5rem; }
+    #biography, #pillars, #lineage, #quotes, #library, #honors { padding: 5rem 1.5rem 8rem; }
+    .bio-item { grid-template-columns: 1fr; gap: 2rem; }
+    .bio-item:nth-child(even) .bio-item__media,
+    .bio-item:nth-child(even) .bio-item__content { order: 0; }
+    .quotes-grid { grid-template-columns: 1fr; }
+    .quote--lg, .quote--md, .quote--full { grid-column: span 1; }
+    .book { grid-template-columns: 60px 1fr; }
+    .book__desc, .book__lang { grid-column: span 2; }
+    .book__lang { text-align: left; }
+    .footer-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+
+  /* === Touch / coarse pointer === */
+  @media (pointer: coarse) {
+    .pillar:hover, .book:hover, .lama:hover, .honor:hover { background: transparent; }
+    .pillar:hover::before, .book:hover::before, .lama:hover::before, .honor:hover::before { height: 0; }
+  }
+
+  /* === Reduced motion === */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+    .manifesto-text .word { opacity: 1 !important; filter: none !important; }
+    canvas.rain { display: none; }
+    .hero__bg-portrait { opacity: 0.1; }
+  }
+</style>
+</head>
+<body>
+
+<canvas class="rain" aria-hidden="true"></canvas>
+
+<nav class="nav">
+  <div class="nav__brand">T G · XIV</div>
+  <div class="nav__links">
+    <a href="#manifesto">Manifesto</a>
+    <a href="#biography">Biography</a>
+    <a href="#pillars">Teachings</a>
+    <a href="#lineage">Lineage</a>
+    <a href="#quotes">Words</a>
+    <a href="#library">Library</a>
+    <a href="#honors">Honors</a>
+  </div>
+</nav>
+
+<!-- ============ HERO (sticky) ============ -->
+<section class="hero" id="hero">
+  <div class="hero__bg-portrait" style="background-image: url('https://picsum.photos/seed/dalai-lama-monk-portrait-archive/1800/1200');"></div>
+  <div class="hero__label">Archive No. 014 · Born 6 July 1935</div>
+  <h1 class="hero__title" id="hero-title">TENZIN GYATSO</h1>
+  <p class="hero__subtitle">His Holiness the Fourteenth Dalai Lama, Tenzin Gyatso, born Lhamo Thondup in Taktser, Amdo. Spiritual leader of the Tibetan people. Nobel laureate. Refugee since 1959. Voice of compassion in an age of noise. A simple Buddhist monk.</p>
+  <div class="hero__scroll">Scroll to begin</div>
+</section>
+
+<div class="below">
+
+<!-- ============ MANIFESTO ============ -->
+<section id="manifesto">
+  <div class="container-narrow">
+    <div class="label">Manifesto · Oslo, 11 December 1989</div>
+    <p class="manifesto-text" id="manifesto-text">Today, more than ever before, life must be characterized by a sense of universal responsibility. Not only nation to nation and human to human, but also human to other forms of life. In this present circumstance, no one can afford to assume that somebody else will solve our problems. Every individual has a responsibility to help guide our global family in the right direction. Good wishes alone are not enough; we must assume responsibility.</p>
+    <div class="manifesto-attribution">— Tenzin Gyatso, Nobel Peace Prize Lecture, University of Oslo, Norway</div>
+  </div>
+</section>
+
+<!-- ============ BIOGRAPHY ============ -->
+<section id="biography">
+  <div class="container">
+    <div class="label">Biography · 1935 — present</div>
+    <h2 class="section-title">A life across<br>two worlds.</h2>
+    <p class="section-intro">From a farming village in Amdo to the Potala Palace. From the Potala across the Himalayas on foot. From exile in Dharamshala to lecture halls on every continent. Eighty-nine years, and counting.</p>
+
+    <div class="bio-list">
+
+      <div class="bio-item">
+        <div class="bio-item__media"><img src="https://picsum.photos/seed/taktser-amdo-tibet-village-1935/900/1100" alt="Taktser village"></div>
+        <div class="bio-item__content">
+          <div class="bio-item__year">1935 · TAKTSER</div>
+          <h3 class="bio-item__heading">A boy born to a farming family in Amdo.</h3>
+          <p class="bio-item__body">Lhamo Thondup was born on 6 July 1935 to a poor farming family in the small village of Taktser, in the Amdo region of northeastern Tibet. He was the ninth of sixteen children; seven of them would die in childhood. The family kept horses, yaks, and sheep. Two years later, a search party of senior monks, guided by visions and the signs following the death of the 13th Dalai Lama, arrived at the farmhouse disguised as servants. The boy recognized a rosary that had belonged to his predecessor and demanded it be given to him. He was identified as the reincarnation.</p>
+        </div>
+      </div>
+
+      <div class="bio-item">
+        <div class="bio-item__media"><img src="https://picsum.photos/seed/potala-palace-lhasa-tibet-1940/900/1100" alt="Potala Palace"></div>
+        <div class="bio-item__content">
+          <div class="bio-item__year">1940 · LHASA</div>
+          <h3 class="bio-item__heading">Enthroned at the Potala at age five.</h3>
+          <p class="bio-item__body">On 22 February 1940, Lhamo Thondup was formally enthroned as the 14th Dalai Lama in a ceremony at the Potala Palace in Lhasa. He was given the monastic name Jetsun Jamphel Ngawang Lobsang Yeshe Tenzin Gyatso — Holy Lord, Gentle Glory, Compassionate, Defender of the Faith, Ocean of Wisdom. His education in Buddhist philosophy, logic, Tibetan art, Sanskrit, medicine, and astrology would continue for the next fifteen years under the guidance of senior monks and tutors. He sat for his final examinations at the Jokhang Temple in Lhasa at the age of 23, in 1959, the year of his exile.</p>
+        </div>
+      </div>
+
+      <div class="bio-item">
+        <div class="bio-item__media"><img src="https://picsum.photos/seed/tibetan-exodus-himalayas-1959-refugees/900/1100" alt="Tibetan exodus"></div>
+        <div class="bio-item__content">
+          <div class="bio-item__year">1959 · FLIGHT</div>
+          <h3 class="bio-item__heading">Crossing the Himalayas into India.</h3>
+          <p class="bio-item__body">On 10 March 1959, a popular uprising against the Chinese occupation erupted in Lhasa. Tens of thousands surrounded the Norbulingka Palace, fearing for the Dalai Lama's life. On the night of 17 March, the 23-year-old disguised himself as a soldier, left the palace under cover of darkness, and began a fifteen-day journey on foot and on horseback across the Himalayas. He crossed into India on 31 March at the Khenzimane Pass. Approximately 80,000 Tibetans would follow him into exile in the years that followed. He has not returned to Tibet since.</p>
+        </div>
+      </div>
+
+      <div class="bio-item">
+        <div class="bio-item__media"><img src="https://picsum.photos/seed/dharamshala-mcleod-ganj-india-exile/900/1100" alt="Dharamshala"></div>
+        <div class="bio-item__content">
+          <div class="bio-item__year">1960 · DHARAMSHALA</div>
+          <h3 class="bio-item__heading">Building a nation outside its borders.</h3>
+          <p class="bio-item__body">In April 1960, the Dalai Lama moved to McLeod Ganj, a small hill station in the Indian state of Himachal Pradesh, where he established the Central Tibetan Administration — the government-in-exile that continues to function from there today. Over the following decades he would establish schools for Tibetan refugee children, monasteries to preserve the philosophical traditions, libraries to archive the literature, agricultural settlements across India and Nepal, and a democratic constitution. He deliberately limited his own authority in favor of elected institutions — a remarkable act for a theocratic ruler.</p>
+        </div>
+      </div>
+
+      <div class="bio-item">
+        <div class="bio-item__media"><img src="https://picsum.photos/seed/nobel-peace-prize-oslo-1989-ceremony/900/1100" alt="Nobel ceremony"></div>
+        <div class="bio-item__content">
+          <div class="bio-item__year">1989 · OSLO</div>
+          <h3 class="bio-item__heading">Awarded the Nobel Peace Prize.</h3>
+          <p class="bio-item__body">On 5 October 1989, the Norwegian Nobel Committee awarded the Dalai Lama the Nobel Peace Prize. The citation praised "his consistent resistance to the use of violence in his people's struggle to regain their liberty" and noted that "in doing so, he has come to stand forth as a spokesman for peace and understanding in a world which, more than ever, needs such spokesmen." In his acceptance lecture he spoke not of Tibet alone but of universal responsibility, of the interdependence of all life, of the duty of every individual to act.</p>
+        </div>
+      </div>
+
+      <div class="bio-item">
+        <div class="bio-item__media"><img src="https://picsum.photos/seed/dalai-lama-public-teaching-lecture-stage/900/1100" alt="Teaching"></div>
+        <div class="bio-item__content">
+          <div class="bio-item__year">2011 · DEVOLUTION</div>
+          <h3 class="bio-item__heading">Voluntarily surrendering political power.</h3>
+          <p class="bio-item__body">On 14 March 2011, the Dalai Lama formally devolved his political authority to an elected leadership of the Central Tibetan Administration. The move ended a 368-year tradition in which the Dalai Lamas held both spiritual and temporal power over Tibet. He described the devolution as the fulfillment of a long-held wish and a necessary step toward the modernization of Tibetan governance. He remains, in his own words and by his own preference, "a simple Buddhist monk."</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ THREE PILLARS ============ -->
+<section id="pillars">
+  <div class="container">
+    <div class="label">Three Pillars · The Architecture of Teaching</div>
+    <h2 class="section-title">Three commitments,<br>sustained for sixty years.</h2>
+    <p class="section-intro">Across the decades of his public life, his message has remained remarkably stable. Not a doctrine, but three interlocking commitments — to be practiced, not merely believed.</p>
+
+    <div class="pillars-list">
+
+      <div class="pillar">
+        <div class="pillar__num">01</div>
+        <div>
+          <div class="pillar__name">Universal Compassion</div>
+          <span class="pillar__tibetan">བྱམས་པ་དང་སྙིང་རྗེ</span>
+        </div>
+        <div class="pillar__body">The cultivation of genuine concern for the suffering of all sentient beings, not only humans. Compassion, in his teaching, is not sentiment but discipline — a daily practice that calms the mind, reduces anxiety, and ultimately benefits the practitioner as much as the recipient. The happier you are, the more you can help. The more you help, the happier you become. He has called this the "selfish altruism" — a recognition that helping others is the most reliable route to one's own happiness.</div>
+        <div class="pillar__year">Lifetime practice</div>
+      </div>
+
+      <div class="pillar">
+        <div class="pillar__num">02</div>
+        <div>
+          <div class="pillar__name">Non-violence</div>
+          <span class="pillar__tibetan">Ahimsa · མི་གནོད་པ་</span>
+        </div>
+        <div class="pillar__body">The deliberate refusal to harm — in speech, action, or thought — even in the face of injustice. He has held this position through the loss of his country, the destruction of an estimated six thousand monasteries during the Cultural Revolution, the deaths of an estimated one million Tibetans in the decades following 1959. He has consistently refused to endorse armed resistance. Dialogue, never weapons. Reconciliation, never revenge. The Nobel Committee called this position "consistent resistance to the use of violence."</div>
+        <div class="pillar__year">Since 1949</div>
+      </div>
+
+      <div class="pillar">
+        <div class="pillar__num">03</div>
+        <div>
+          <div class="pillar__name">Universal Responsibility</div>
+          <span class="pillar__tibetan">ཀུན་གྱི་འགན་འཁྲི་</span>
+        </div>
+        <div class="pillar__body">The recognition that the modern world — climate, weapons, pandemics, poverty, artificial intelligence — cannot be solved by any nation or ideology alone. Each person carries a share of the global burden. Good intentions are insufficient. Action is required. Small actions, multiplied across millions of individuals, become the future. He has spoken of this responsibility in addresses to the European Parliament, the United States Congress, the United Nations, and at countless universities.</div>
+        <div class="pillar__year">Since 1973</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ LINEAGE ============ -->
+<section id="lineage">
+  <div class="container">
+    <div class="label">The Lineage · 1391 — present</div>
+    <h2 class="section-title">Six hundred years,<br>fourteen incarnations.</h2>
+    <p class="section-intro">The institution of the Dalai Lama traces its origins to Gendun Drub, a 15th-century scholar, monk, and disciple of Tsongkhapa, founder of the Gelug school of Tibetan Buddhism. The title "Dalai Lama" — meaning "Ocean of Wisdom" in Mongolian — was conferred on the third incarnation by Altan Khan in 1578. The lineage has continued unbroken since 1391.</p>
+
+    <div class="lineage-grid">
+      <div class="lama"><div class="lama__num">01</div><div class="lama__name">Gendun Drub</div><div class="lama__dates">1391 — 1474</div></div>
+      <div class="lama"><div class="lama__num">02</div><div class="lama__name">Gendun Gyatso</div><div class="lama__dates">1475 — 1542</div></div>
+      <div class="lama"><div class="lama__num">03</div><div class="lama__name">Sonam Gyatso</div><div class="lama__dates">1543 — 1588</div></div>
+      <div class="lama"><div class="lama__num">04</div><div class="lama__name">Yonten Gyatso</div><div class="lama__dates">1589 — 1617</div></div>
+      <div class="lama"><div class="lama__num">05</div><div class="lama__name">Lobsang Gyatso</div><div class="lama__dates">1617 — 1682</div></div>
+      <div class="lama"><div class="lama__num">06</div><div class="lama__name">Tsangyang Gyatso</div><div class="lama__dates">1683 — 1706</div></div>
+      <div class="lama"><div class="lama__num">07</div><div class="lama__name">Kelsang Gyatso</div><div class="lama__dates">1708 — 1757</div></div>
+      <div class="lama"><div class="lama__num">08</div><div class="lama__name">Jamphel Gyatso</div><div class="lama__dates">1758 — 1804</div></div>
+      <div class="lama"><div class="lama__num">09</div><div class="lama__name">Lungtok Gyatso</div><div class="lama__dates">1805 — 1815</div></div>
+      <div class="lama"><div class="lama__num">10</div><div class="lama__name">Tsultrim Gyatso</div><div class="lama__dates">1816 — 1837</div></div>
+      <div class="lama"><div class="lama__num">11</div><div class="lama__name">Khedrup Gyatso</div><div class="lama__dates">1838 — 1856</div></div>
+      <div class="lama"><div class="lama__num">12</div><div class="lama__name">Trinley Gyatso</div><div class="lama__dates">1857 — 1875</div></div>
+      <div class="lama"><div class="lama__num">13</div><div class="lama__name">Thubten Gyatso</div><div class="lama__dates">1876 — 1933</div></div>
+      <div class="lama current"><div class="lama__num">14</div><div class="lama__name">Tenzin Gyatso</div><div class="lama__dates">1935 — present</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUOTES ============ -->
+<section id="quotes">
+  <div class="container">
+    <div class="label">Words · Recorded Speech</div>
+    <h2 class="section-title">The spare sentences<br>of a long teaching.</h2>
+
+    <div class="quotes-grid">
+      <div class="quote quote--lg">
+        <p class="quote__text">"Love and compassion are necessities, not luxuries. Without them, humanity cannot survive."</p>
+        <div class="quote__attr">The Art of Happiness · 1998</div>
+      </div>
+      <div class="quote quote--md">
+        <p class="quote__text">"Our prime purpose in this life is to help others. And if you can't help them, at least don't hurt them."</p>
+        <div class="quote__attr">Public teaching · Dharamshala</div>
+      </div>
+      <div class="quote quote--full">
+        <p class="quote__text">"If you think you are too small to make a difference, try sleeping with a mosquito."</p>
+        <div class="quote__attr">Address · Riga, Latvia · 2018</div>
+      </div>
+      <div class="quote quote--md">
+        <p class="quote__text">"The purpose of our lives is to be happy."</p>
+        <div class="quote__attr">The Art of Happiness · 1998</div>
+      </div>
+      <div class="quote quote--lg">
+        <p class="quote__text">"Be kind whenever possible. It is always possible."</p>
+        <div class="quote__attr">Public teaching · New York · 2003</div>
+      </div>
+      <div class="quote quote--full">
+        <p class="quote__text">"This is my simple religion. There is no need for temples; no need for complicated philosophy. Our own brain, our own heart is our temple; the philosophy is kindness."</p>
+        <div class="quote__attr">Ethics for the New Millennium · 1999</div>
+      </div>
+      <div class="quote quote--md">
+        <p class="quote__text">"When we feel love and kindness toward others, it not only makes others feel loved and cared for, but it helps us also to develop inner happiness and peace."</p>
+        <div class="quote__attr">Live in a Better Way · 2001</div>
+      </div>
+      <div class="quote quote--lg">
+        <p class="quote__text">"World peace must develop from inner peace. Peace is not just mere absence of violence. Peace is, I think, the manifestation of human compassion."</p>
+        <div class="quote__attr">Nobel Lecture · Oslo · 1989</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LIBRARY ============ -->
+<section id="library">
+  <div class="container">
+    <div class="label">The Library · Selected Works</div>
+    <h2 class="section-title">A body of writing,<br>1962 to the present.</h2>
+    <p class="section-intro">His Holiness has authored or co-authored more than seventy books. They range from technical works on Buddhist philosophy, written in Tibetan, to bestselling co-authored volumes with Western psychologists, neuroscientists, and philosophers. The list below is a selection.</p>
+
+    <div class="book-list">
+      <div class="book">
+        <div class="book__year">1962</div>
+        <div class="book__title">My Land and My People</div>
+        <div class="book__desc">His first autobiographical account, written in exile, of Tibet before the Chinese occupation and his early years as Dalai Lama. Composed in Tibetan, translated and published in English.</div>
+        <div class="book__lang">EN · TIB</div>
+      </div>
+      <div class="book">
+        <div class="book__year">1966</div>
+        <div class="book__title">The Opening of the Wisdom-Eye</div>
+        <div class="book__desc">A condensed presentation of the path to enlightenment, drawn from the Lamrim tradition of Tsongkhapa. A standard introductory text for serious students of Tibetan Buddhism.</div>
+        <div class="book__lang">EN</div>
+      </div>
+      <div class="book">
+        <div class="book__year">1988</div>
+        <div class="book__title">The Dalai Lama at Harvard</div>
+        <div class="book__desc">Lectures given at Harvard University in 1981 on Buddhist paths to compassion, the role of altruism in human psychology, and the dialogue between Buddhist and Western thought.</div>
+        <div class="book__lang">EN</div>
+      </div>
+      <div class="book">
+        <div class="book__year">1990</div>
+        <div class="book__title">Freedom in Exile</div>
+        <div class="book__desc">The second autobiography. Covers the years from the 1959 flight from Lhasa through the Nobel Peace Prize, including the formation of the government-in-exile in Dharamshala.</div>
+        <div class="book__lang">EN · 24 lang</div>
+      </div>
+      <div class="book">
+        <div class="book__year">1995</div>
+        <div class="book__title">The Power of Compassion</div>
+        <div class="book__desc">A collection of teachings on the cultivation of bodhicitta — the awakened heart of compassion — and its role in daily life and ethical conduct.</div>
+        <div class="book__lang">EN</div>
+      </div>
+      <div class="book">
+        <div class="book__year">1998</div>
+        <div class="book__title">The Art of Happiness</div>
+        <div class="book__desc">Co-authored with psychiatrist Howard Cutler. A handbook for living drawn from extended conversations. The book that introduced his thought to a broad Western lay audience; on bestseller lists for ninety-seven weeks.</div>
+        <div class="book__lang">EN · 50 lang</div>
+      </div>
+      <div class="book">
+        <div class="book__year">1999</div>
+        <div class="book__title">Ethics for the New Millennium</div>
+        <div class="book__desc">An argument that ethics need not be grounded in religion, but in a shared human capacity for compassion. Written for a secular, global readership at the turn of the millennium.</div>
+        <div class="book__lang">EN · 30 lang</div>
+      </div>
+      <div class="book">
+        <div class="book__year">2005</div>
+        <div class="book__title">The Universe in a Single Atom</div>
+        <div class="book__desc">On the convergence of Buddhist thought and modern science — a dialogue sustained across four decades through the Mind & Life Institute. Covers quantum physics, cosmology, consciousness, and ethics.</div>
+        <div class="book__lang">EN · 22 lang</div>
+      </div>
+      <div class="book">
+        <div class="book__year">2011</div>
+        <div class="book__title">Beyond Religion</div>
+        <div class="book__desc">A call for a secular ethics grounded in shared human values — compassion, tolerance, restraint — independent of any particular faith tradition. A direct extension of his 1999 argument.</div>
+        <div class="book__lang">EN · 25 lang</div>
+      </div>
+      <div class="book">
+        <div class="book__year">2016</div>
+        <div class="book__title">The Book of Joy</div>
+        <div class="book__desc">A week of conversations with Archbishop Desmond Tutu in Dharamshala, on lasting happiness in a suffering world. The two old friends laugh together often in these pages.</div>
+        <div class="book__lang">EN · 40 lang</div>
+      </div>
+      <div class="book">
+        <div class="book__year">2019</div>
+        <div class="book__title">The Little Book of Buddhism</div>
+        <div class="book__desc">A pocket-sized selection of teachings on suffering, impermanence, and the path of compassion. Drawn from public addresses given over the preceding decade.</div>
+        <div class="book__lang">EN · 18 lang</div>
+      </div>
+      <div class="book">
+        <div class="book__year">2021</div>
+        <div class="book__title">The Secret Lives of the Dalai Lama</div>
+        <div class="book__desc">A historical reflection on the lineage of the Dalai Lamas across six centuries — written with scholar Alexander Norman. The institution viewed from the inside.</div>
+        <div class="book__lang">EN</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HONORS ============ -->
+<section id="honors">
+  <div class="container">
+    <div class="label">Recognition · Honors Conferred</div>
+    <h2 class="section-title">A selected list,<br>by no means complete.</h2>
+    <p class="section-intro">Over one hundred and fifty honorary doctorates, civil honors from dozens of nations, and prizes from foundations on every continent. The list below is partial and selected.</p>
+
+    <div class="honors-list">
+      <div class="honor">
+        <div class="honor__year">1989</div>
+        <div class="honor__text"><strong>Nobel Peace Prize</strong> — Norwegian Nobel Committee, Oslo. For "consistent resistance to the use of violence in his people's struggle to regain their liberty."</div>
+      </div>
+      <div class="honor">
+        <div class="honor__year">1989</div>
+        <div class="honor__text"><strong>Raoul Wallenberg Congressional Human Rights Award</strong> — for courage in defense of human rights.</div>
+      </div>
+      <div class="honor">
+        <div class="honor__year">1994</div>
+        <div class="honor__text"><strong>Julius Nyerere Peace Award</strong> — for non-violent struggle and reconciliation.</div>
+      </div>
+      <div class="honor">
+        <div class="honor__year">1998</div>
+        <div class="honor__text"><strong>Liberty Medal</strong> — National Constitution Center, Philadelphia. For his commitment to non-violence, religious harmony, and the cause of Tibet.</div>
+      </div>
+      <div class="honor">
+        <div class="honor__year">2005</div>
+        <div class="honor__text"><strong>International Freedom Conductor Award</strong> — for advancement of human freedom.</div>
+      </div>
+      <div class="honor">
+        <div class="honor__year">2006</div>
+        <div class="honor__text"><strong>Honorary Citizen of Canada</strong> — only the sixth person ever granted this honor by the Parliament of Canada.</div>
+      </div>
+      <div class="honor">
+        <div class="honor__year">2007</div>
+        <div class="honor__text"><strong>United States Congressional Gold Medal</strong> — the highest civilian honor of the United States Congress. Presented by President George W. Bush.</div>
+      </div>
+      <div class="honor">
+        <div class="honor__year">2008</div>
+        <div class="honor__text"><strong>German Media Prize</strong> — for outstanding contributions to peace, understanding, and tolerance in a globalized world.</div>
+      </div>
+      <div class="honor">
+        <div class="honor__year">2010</div>
+        <div class="honor__text"><strong>Honorary Doctorate</strong> — more than one hundred and fifty universities worldwide have conferred doctorates honoris causa, including Harvard, Yale, Cambridge, the Sorbonne, and the Hebrew University of Jerusalem.</div>
+      </div>
+      <div class="honor">
+        <div class="honor__year">2012</div>
+        <div class="honor__text"><strong>Templeton Prize</strong> — for progress toward research or discoveries about spiritual realities. Endowed at £1.1 million, all of which he donated to charity.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-mantra">ༀ་མ་ཎི་པདྨེ་ཧཱུཾ</div>
+      <p class="footer-translit">OM MANI PADME HUM — the six-syllable mantra of Avalokiteshvara, the bodhisattva of compassion, of whom the Dalai Lamas are considered emanations. Carved into prayer stones across the Tibetan plateau for more than a thousand years. Recited daily by millions.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Sections</h4>
+      <ul>
+        <li><a href="#manifesto">Manifesto</a></li>
+        <li><a href="#biography">Biography</a></li>
+        <li><a href="#pillars">Teachings</a></li>
+        <li><a href="#lineage">Lineage</a></li>
+        <li><a href="#quotes">Words</a></li>
+        <li><a href="#library">Library</a></li>
+        <li><a href="#honors">Honors</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Authority</h4>
+      <ul>
+        <li>Office of His Holiness</li>
+        <li>The 14th Dalai Lama</li>
+        <li>Thekchen Choeling</li>
+        <li>McLeod Ganj, Dharamshala</li>
+        <li>Himachal Pradesh 176215</li>
+        <li>India</li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Principal Recognition</h4>
+      <ul>
+        <li>Nobel Peace Prize · 1989</li>
+        <li>US Congressional Gold · 2007</li>
+        <li>Templeton Prize · 2012</li>
+        <li>Liberty Medal · 1998</li>
+        <li>Honorary Citizen of Canada · 2006</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>Archive No. 014 · Established 1935 · Maintained in exile</div>
+    <div>May all beings be happy · May all beings be free</div>
+  </div>
+</footer>
+
+<!-- ============ SCRIPTS ============ -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+<script>
+(function() {
+  'use strict';
+
+  const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const COARSE = window.matchMedia('(pointer: coarse)').matches;
+
+  // ============ MATRIX RAIN ============
+  function initRain() {
+    const cvs = document.querySelector('canvas.rain');
+    if (!cvs || REDUCED) {
+      if (cvs) cvs.style.display = 'none';
+      return;
+    }
+
+    const ctx = cvs.getContext('2d');
+    let raf = null;
+    let running = false;
+
+    function resize() {
+      cvs.width = window.innerWidth;
+      cvs.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const FONT_SIZE = 14;
+    const COL_W = 20;
+    const CHARS_LATIN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789{}<>/\\|+-=*#';
+    const CHARS_TIBETAN = 'ཀཁགངཅཆཇཉཏཐདནཔཕབམཙཚཛཝཞཟའཡརལཤསཧཨ༠༡༢༣༤༥༦༧༨༩';
+    const MIX = (CHARS_LATIN + CHARS_TIBETAN + CHARS_TIBETAN).split('');
+
+    let cols = Math.floor(window.innerWidth / COL_W);
+    let drops = Array.from({ length: cols }, () => Math.random() * -window.innerHeight);
+
+    window.addEventListener('resize', () => {
+      cols = Math.floor(window.innerWidth / COL_W);
+      drops = Array.from({ length: cols }, () => Math.random() * -window.innerHeight);
+    });
+
+    function frame() {
+      if (!running) return;
+
+      ctx.fillStyle = 'rgba(5, 5, 8, 0.08)';
+      ctx.fillRect(0, 0, cvs.width, cvs.height);
+
+      ctx.font = FONT_SIZE + 'px "JetBrains Mono", monospace';
+
+      for (let i = 0; i < cols; i++) {
+        const x = i * COL_W;
+        const y = drops[i];
+
+        // Sparse bright head
+        const bright = Math.random() < 0.02;
+        if (bright) {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        } else {
+          ctx.fillStyle = 'rgba(0, 212, 255, 0.4)';
+        }
+        ctx.fillText(MIX[Math.floor(Math.random() * MIX.length)], x, y);
+
+        drops[i] = y > cvs.height && Math.random() > 0.975 ? 0 : y + 12;
+      }
+
+      raf = requestAnimationFrame(frame);
+    }
+
+    // Pause on tab hidden
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && running) {
+        running = false;
+        if (raf) cancelAnimationFrame(raf);
+        raf = null;
+      } else if (!document.hidden && !running) {
+        running = true;
+        frame();
+      }
+    });
+
+    // Start
+    running = true;
+    frame();
+  }
+
+  // ============ HERO TITLE DECODE ============
+  function initDecodeTitle() {
+    const el = document.getElementById('hero-title');
+    if (!el) return;
+    const TARGET = el.textContent.trim();
+
+    if (REDUCED) {
+      el.textContent = TARGET;
+      return;
+    }
+
+    const CHARS = '!<>-_\\/[]{}—=+*^?#0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let iter = 0;
+    const PER_CHAR = 5;
+    const max = TARGET.length * PER_CHAR;
+
+    el.textContent = '';
+
+    function tick() {
+      const out = TARGET.split('').map((ch, i) => {
+        if (ch === ' ') return ' ';
+        return i < iter / PER_CHAR ? TARGET[i] : CHARS[Math.floor(Math.random() * CHARS.length)];
+      }).join('');
+      el.textContent = out;
+      iter += 1;
+      if (iter >= max) {
+        el.textContent = TARGET;
+        return;
+      }
+      setTimeout(tick, 35);
+    }
+
+    setTimeout(tick, 700);
+  }
+
+  // ============ GSAP-DEPENDENT ANIMATIONS ============
+  function initGSAP() {
+    if (!window.gsap || !window.ScrollTrigger || REDUCED) {
+      // Fallback: show manifesto text
+      const textEl = document.getElementById('manifesto-text');
+      if (textEl && !window.gsap) {
+        // Just leave the text visible
+      }
+      return;
+    }
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    // ============ Manifesto scrub-blur-words ============
+    const textEl = document.getElementById('manifesto-text');
+    if (textEl) {
+      const raw = textEl.textContent.trim();
+      const words = raw.split(/\s+/);
+      textEl.innerHTML = words.map(w => '<span class="word">' + w + '</span>').join(' ');
+
+      gsap.fromTo('#manifesto-text .word',
+        { opacity: 0.15, filter: 'blur(12px) brightness(30%)' },
+        {
+          opacity: 1,
+          filter: 'blur(0px) brightness(100%)',
+          stagger: 0.04,
+          ease: 'sine.out',
+          scrollTrigger: {
+            trigger: textEl,
+            start: 'top 78%',
+            end: 'center 50%',
+            scrub: true,
+          },
+        }
+      );
+    }
+
+    // ============ Hero sticky parallax ============
+    const hero = document.querySelector('.hero');
+    const heroPortrait = document.querySelector('.hero__bg-portrait');
+    const heroTitle = document.querySelector('.hero__title');
+    const heroLabel = document.querySelector('.hero__label');
+    const heroSubtitle = document.querySelector('.hero__subtitle');
+    const heroScroll = document.querySelector('.hero__scroll');
+
+    if (hero && heroTitle) {
+      ScrollTrigger.create({
+        trigger: hero,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1,
+        onUpdate: (s) => {
+          const p = s.progress;
+          if (heroPortrait) gsap.set(heroPortrait, { yPercent: p * 30, scale: 1 + p * 0.12, opacity: 0.16 * (1 - p * 0.8) });
+          if (heroTitle) gsap.set(heroTitle, { yPercent: p * 25, opacity: 1 - p * 1.4, scale: 1 - p * 0.05 });
+          if (heroLabel) gsap.set(heroLabel, { opacity: 1 - p * 1.6 });
+          if (heroSubtitle) gsap.set(heroSubtitle, { opacity: 1 - p * 1.6, yPercent: p * 15 });
+          if (heroScroll) gsap.set(heroScroll, { opacity: 1 - p * 2 });
+        },
+      });
+    }
+
+    // ============ Bio directional clip reveals ============
+    const dirs = [
+      'inset(0 100% 0 0)',   // L→R
+      'inset(0 0 100% 0)',   // T→B
+      'inset(0 0 0 100%)',   // R→L
+      'inset(100% 0 0 0)',   // B→T
+    ];
+
+    document.querySelectorAll('.bio-item').forEach((item, i) => {
+      const media = item.querySelector('.bio-item__media');
+      const img = item.querySelector('.bio-item__media img');
+      const content = item.querySelector('.bio-item__content');
+      if (!media) return;
+
+      const dir = dirs[i % dirs.length];
+      gsap.set(media, { clipPath: dir });
+      if (img) gsap.set(img, { scale: 1.3 });
+      if (content) gsap.set(content, { opacity: 0, y: 30 });
+
+      ScrollTrigger.create({
+        trigger: item,
+        start: 'top 82%',
+        once: true,
+        onEnter: () => {
+          gsap.to(media, {
+            clipPath: 'inset(0% 0% 0% 0%)',
+            duration: 1.3,
+            ease: 'power4.inOut',
+          });
+          if (img) {
+            gsap.to(img, {
+              scale: 1.05,
+              duration: 1.7,
+              ease: 'power3.out',
+            });
+          }
+          if (content) {
+            gsap.to(content, {
+              opacity: 1,
+              y: 0,
+              duration: 1,
+              ease: 'power3.out',
+              delay: 0.35,
+            });
+          }
+        },
+      });
+    });
+
+    // ============ Section titles entrance ============
+    document.querySelectorAll('.section-title, .section-intro').forEach((el) => {
+      gsap.set(el, { opacity: 0, y: 30 });
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 85%',
+        once: true,
+        onEnter: () => {
+          gsap.to(el, {
+            opacity: 1,
+            y: 0,
+            duration: 1.2,
+            ease: 'power3.out',
+          });
+        },
+      });
+    });
+
+    // ============ Quote tiles entrance ============
+    document.querySelectorAll('.quote').forEach((q, i) => {
+      gsap.set(q, { opacity: 0, y: 40 });
+      ScrollTrigger.create({
+        trigger: q,
+        start: 'top 88%',
+        once: true,
+        onEnter: () => {
+          gsap.to(q, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: 'power3.out',
+            delay: (i % 3) * 0.08,
+          });
+        },
+      });
+    });
+
+    // ============ List items entrance (lineage, books, honors) ============
+    document.querySelectorAll('.lama, .book, .honor, .pillar').forEach((el, i) => {
+      gsap.set(el, { opacity: 0, y: 20 });
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 92%',
+        once: true,
+        onEnter: () => {
+          gsap.to(el, {
+            opacity: 1,
+            y: 0,
+            duration: 0.85,
+            ease: 'power3.out',
+            delay: (i % 4) * 0.05,
+          });
+        },
+      });
+    });
+
+    // ============ Label entrance ============
+    document.querySelectorAll('.label').forEach((el) => {
+      gsap.set(el, { opacity: 0, x: -20 });
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 88%',
+        once: true,
+        onEnter: () => {
+          gsap.to(el, {
+            opacity: 1,
+            x: 0,
+            duration: 0.9,
+            ease: 'power3.out',
+          });
+        },
+      });
+    });
+  }
+
+  // ============ INIT ON LOAD ============
+  initRain();
+  initDecodeTitle();
+
+  if (document.readyState === 'complete') {
+    initGSAP();
+  } else {
+    window.addEventListener('load', initGSAP);
+  }
+
+  // Smooth anchor scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      const id = a.getAttribute('href');
+      if (id === '#' || id.length < 2) return;
+      const target = document.querySelector(id);
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+})();
+</script>
+
+</body>
+</html>
