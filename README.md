@@ -1,0 +1,1 @@
+A test of Z.ai's current coding capabilities. I asked GLM-5.2 through Novita AI to build me a website celebrating the Dalai Lama. The prompt used was "Please build me a website celebrating the Dalai Lama", in English. No alterations were made to the model's work.
